@@ -1,0 +1,36 @@
+name: Build iOS Dylib
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Install Theos dependencies
+        run: |
+          brew install ldid xz
+
+      - name: Setup Theos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+          echo "THEOS=~/theos" >> $GITHUB_ENV
+
+      - name: Build Dylib
+        run: |
+          export THEOS=~/theos
+          make
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: adspeed-Release
+          path: |
+            .theos/obj/**/*.dylib
+            .theos/obj/*.dylib
