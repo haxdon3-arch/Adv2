@@ -27,10 +27,13 @@ jobs:
           export THEOS=~/theos
           make
 
+      - name: Extract Dylib
+        run: |
+          mkdir -p payload
+          find . -name "*.dylib" -exec cp {} payload/ \;
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: adspeed-Release
-          path: |
-            .theos/obj/**/*.dylib
-            .theos/obj/*.dylib
+          path: payload/
